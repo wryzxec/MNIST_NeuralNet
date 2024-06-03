@@ -39,6 +39,10 @@ class MnistDataHandler:
         
         return images, np.array(labels)
     
+    def normalise(self, x):
+        x = x / 255
+        return x
+
     def load_training_data(self):
         x_train, y_train = self.read_images_labels(self.training_images_filepath, self.training_labels_filepath)
         x_train = np.reshape(x_train, (-1, 28*28))
@@ -86,7 +90,7 @@ class MnistDataHandler:
             images_to_show.append(x_train[r])
             titles_to_show.append('y = ' + str(y_train[r]))
 
-        return images_to_show, titles_to_show    
+        return images_to_show, titles_to_show
 
 def main(): 
     mnist_data_handler = MnistDataHandler()

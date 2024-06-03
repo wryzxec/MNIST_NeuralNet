@@ -123,14 +123,14 @@ def main():
     x_train, y_train = mnist_data_handler.load_training_data()
 
     x_train = x_train.T
-    x_train = x_train / 255
+    x_train = mnist_data_handler.normalise(x_train)
 
     neural_network = NeuralNetwork([40, 20, 10])
     neural_network.training_loop(x_train, y_train, 100, 0.1)
 
     x_test, y_test = mnist_data_handler.load_test_data()
     x_test = x_test.T
-    x_test = x_test / 255
+    x_test = mnist_data_handler.normalise(x_test)
 
     neural_network.run_testing(x_test, y_test,
                                 neural_network.W1, neural_network.W2, neural_network.W3,
