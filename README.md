@@ -1,11 +1,18 @@
 # MNIST Neural Network with NumPy
 
+- [MNIST Database](#mnist-database)
 - [Network Structure](#network-structure)
 - [Activation Functions](#activation-functions)
 - [Loss Function](#loss-function)
 - [Back Propagation](#back-propagation)
 - [He Initialization](#he-initialization)
 - [Analysing Results](#analysing-results)
+
+## Mnist Database
+The MNIST database is a large database, containing 70,000 images of handwritten digits.
+
+Each image is black and white, 28x28 pixels in size, and contains a singular handwritten digit.  
+
 
 ## Network Structure
 
