@@ -60,7 +60,7 @@ $$
 \begin{align*}
 \frac{\delta L}{\delta z_k} &= \frac{\delta(-\sum_{i=1}y_i\log(o_i))}{\delta(z_k)}\\
 &= -\sum_{i=1} \frac{\delta(y_i \log(o_i))}{\delta(z_k)}\\
-&= -\sum_{i=1} y_i\cdot \frac{\delta(\log(o_i)}{\delta(z_k)}\hspace{10pt} \text{Since } y_i \text{ is independent of } o_i
+&= -\sum_{i=1} y_i\cdot \frac{\delta(\log(o_i)}{\delta(z_k)}\hspace{10pt} \text{Since } y_i \text{ is independent of } z_k
 \end{align*}
 $$
 
