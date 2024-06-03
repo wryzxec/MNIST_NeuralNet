@@ -18,7 +18,13 @@ Each image is black and white, 28x28 pixels in size, and contains a singular han
 
 ## Network Structure
 
-Network Structure
+This image is a simplified version of the networks architecture. It contains an input layer, hidden layers and an output layer. One important thing to note is that the output contains 10 different nodes. These correspond to the 10 digits (0-9) that the network is attempting to classify.
+
+The ReLU functions in the hidden layers introduce non-linearity and a softmax function is applied to the output to convert the raw output (logits) to probabilities, which sum to 1.
+
+In reality, the input layer contains 784 (28*28) input features and there are many more neurons in the hidden layers, however the general architecture is the same between the neural network in this image and the one in the code.
+
+![Neural Network Architecture Image](assets/neural_network_architecture.png)
 
 ## Activation Functions
 
