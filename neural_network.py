@@ -5,6 +5,15 @@ class NeuralNetwork:
     def __init__(self, layers):
 
         self.layers = layers
+
+        self.W1 = []
+        self.W2 = []
+        self.W3 = []
+
+        self.b1 = []
+        self.b2 = []
+        self.b3 = []
+
         
     def init_weights_and_biases(self, X, layers):
         W1 = np.random.randn(layers[0], X.shape[0]) * np.sqrt(2.0/X.shape[0])
@@ -16,7 +25,6 @@ class NeuralNetwork:
         b3 = np.random.randn(layers[2], 1) * 0.1
 
         return W1, b1, W2, b2, W3, b3
-
 
     def relu(self, Z):
         return np.maximum(0, Z)
@@ -89,7 +97,7 @@ class NeuralNetwork:
     def training_loop(self, X, Y, epochs, alpha):
         W1, b1, W2, b2, W3, b3 = self.init_weights_and_biases(X, self.layers)
         for i in range(epochs):
-            a1, a2, a3, z1, z2, z3 = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
+            a1, a2, a3, z1, z2, _ = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
             dW1, db1, dW2, db2, dW3, db3 = self.back_prop(z1, a1, z2, a2, W2, a3, W3, X, Y)
             W1, b1, W2, b2, W3, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
             if(i % 10 == 0):
@@ -97,7 +105,18 @@ class NeuralNetwork:
                 print('Accuracy: ', self.accuracy(Y, self.predictions(a3)))
                 print('Loss: ', self.categorical_cross_entropy(self.one_hot(Y), a3))
         print('Accuracy after training: ', self.accuracy(Y, self.predictions(a3)))
-        
+
+        # save the post-training weights and biases
+        self.W1 = W1
+        self.W2 = W2
+        self.W3 = W3
+        self.b1 = b1
+        self.b2 = b2 
+        self.b3 = b3
+
+    def run_testing(self, X, Y, W1, W2, W3, b1, b2, b3):
+        _, _, a3, _, _, _ = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
+        print('Test Accuracy: ', self.accuracy(Y, self.predictions(a3)))
 
 def main():
     mnist_data_handler = MnistDataHandler()
@@ -107,7 +126,17 @@ def main():
     x_train = x_train / 255
 
     neural_network = NeuralNetwork([40, 20, 10])
-    neural_network.training_loop(x_train, y_train, 150, 0.1)
+    neural_network.training_loop(x_train, y_train, 100, 0.1)
+
+    x_test, y_test = mnist_data_handler.load_test_data()
+    x_test = x_test.T
+    x_test = x_test / 255
+
+    neural_network.run_testing(x_test, y_test,
+                                neural_network.W1, neural_network.W2, neural_network.W3,
+                                  neural_network.b1, neural_network.b2, neural_network.b3)
+
+    
 
     
 if __name__ == '__main__':
