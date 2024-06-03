@@ -5,7 +5,7 @@
 - [Loss Function](#loss-function)
 - [Back Propagation](#back-propagation)
 - [He Initialization](#he-initialization)
-- [Analyzing Results](#analyzing-results)
+- [Analysing Results](#analysing-results)
 
 ## Network Structure
 
@@ -45,7 +45,7 @@ Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the pr
 We know that 
 
 $$
-L = -\sum_{i=1}^H y_i \log(o_i)
+L = -\sum_{i=1} y_i \log(o_i)
 $$
 
 where $o_i$ is the output of the softmax function, given by
@@ -87,8 +87,8 @@ $\frac{\delta o_i}{\delta z_k}$ is the derivative of the Softmax output with res
 $$
 \frac{\delta o_i}{\delta z_k} = 
 \begin{cases}
-    o_i(1-o_i) &\text{if } i = k \\
-    -o_i \cdot o_i &\text{if } i \ne k \\
+    o_k(1-o_k) &\text{if } i = k \\
+    -o_i \cdot o_k &\text{if } i \ne k \\
   \end{cases}
 $$
 
@@ -96,8 +96,25 @@ In order to use this definition within our equation for $\frac{\delta L}{\delta 
 
 $$
 \begin{align*}
-\frac{\delta L}{\delta z_k} &= -\left[ \sum_{i\ne k}\left(\frac{y_i}{o_i}\cdot -o_i\cdot o_i \right) + \frac{y_k}{o_k}\cdot(1-o_k)\right]\\
-&= -\left[ \sum_{i\ne k}\left(\frac{y_i}{o_i}\cdot -o_i\cdot o_i \right) + \frac{y_k}{o_k}\cdot(1-o_k)\right]
+\frac{\delta L}{\delta z_k} &= -\left[ \sum_{i\ne k}\left(\frac{y_i}{o_k}\cdot -o_i\cdot o_k \right) + \frac{y_k}{o_k}\cdot o_k(1-o_k)\right]\\
+&= -\left[ \sum_{i\ne k}\left(-y_i\cdot o_k \right) + y_k(1-o_k)\right]\\
+&= -\left[-o_k\sum_{i\ne k}\left(-y_i \right) + y_k(1-o_k)\right]
+\end{align*}
+$$
+
+Since $y_i$ is one-hot encoded, we know that
+
+$$
+\sum_{i=1}y_i = 1 \hspace{10pt} \text{ and } \hspace{10pt} \sum_{i\ne k}y_i = 1 - y_k
+$$
+
+Therefore
+
+$$
+\begin{align*}
+\frac{\delta L}{\delta z_k} &= -\left[-o_k(1-y_k) + y_k(1-o_k)\right]\\
+&= -\left[-o_k + o_k\cdot y_k + y_k -o_k\cdot y_k)\right]\\
+&= o_k - y_k
 \end{align*}
 $$
 
