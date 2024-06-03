@@ -13,6 +13,8 @@ The MNIST database is a large database, containing 70,000 images of handwritten 
 
 Each image is black and white, 28x28 pixels in size, and contains a singular handwritten digit.  
 
+![MNIST Example Images](assets/MNIST_example_1.png)
+
 
 ## Network Structure
 
