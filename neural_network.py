@@ -1,5 +1,6 @@
 import numpy as np
 from mnist_data_handler import MnistDataHandler
+import matplotlib.pyplot as plt
 
 class NeuralNetwork:
     def __init__(self, layers):
@@ -16,13 +17,14 @@ class NeuralNetwork:
 
         
     def init_weights_and_biases(self, X, layers):
+        # He initialisation
         W1 = np.random.randn(layers[0], X.shape[0]) * np.sqrt(2.0/X.shape[0])
         W2 = np.random.randn(layers[1], layers[0]) * np.sqrt(2.0/layers[0])
         W3 = np.random.randn(layers[2], layers[1] ) * np.sqrt(2.0/layers[1])
 
-        b1 = np.random.randn(layers[0], 1) * 0.1
-        b2 = np.random.randn(layers[1], 1) * 0.1
-        b3 = np.random.randn(layers[2], 1) * 0.1
+        b1 = np.zeros((layers[0], 1))
+        b2 = np.zeros((layers[1], 1))
+        b3 = np.zeros((layers[2], 1))
 
         return W1, b1, W2, b2, W3, b3
 
@@ -47,6 +49,19 @@ class NeuralNetwork:
 
     def predictions(self, A2):
         return np.argmax(A2, axis=0)
+
+    def incorrect_predictions(self, X, Y, Y_hat):
+        
+        incorrect_images = []
+        incorrect_labels = []
+        
+        for i in range(Y.size):
+            if(Y[i] != Y_hat[i]):
+                incorrect_images.append(X[:, i])
+                incorrect_labels.append(Y_hat[i])
+
+        return incorrect_images, incorrect_labels
+                
 
     def accuracy(self, Y, Y_hat):
         return np.mean(Y == Y_hat)
@@ -126,7 +141,7 @@ def main():
     x_train = mnist_data_handler.normalise(x_train)
 
     neural_network = NeuralNetwork([40, 20, 10])
-    neural_network.training_loop(x_train, y_train, 100, 0.1)
+    neural_network.training_loop(x_train, y_train, 200, 0.5)
 
     x_test, y_test = mnist_data_handler.load_test_data()
     x_test = x_test.T
@@ -135,8 +150,11 @@ def main():
     neural_network.run_testing(x_test, y_test,
                                 neural_network.W1, neural_network.W2, neural_network.W3,
                                   neural_network.b1, neural_network.b2, neural_network.b3)
-
     
+    incorrect_images, incorrect_labels = neural_network.incorrect_predictions(x_test, y_test, neural_network.predictions(neural_network.forward_prop(x_test, neural_network.W1, neural_network.b1, neural_network.W2, neural_network.b2, neural_network.W3, neural_network.b3)[2]))
+    mnist_data_handler.plot_images(incorrect_images[:10], incorrect_labels[:10])
+
+    plt.show()
 
     
 if __name__ == '__main__':
