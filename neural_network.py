@@ -6,6 +6,7 @@ class NeuralNetwork:
     def __init__(self, layers):
 
         self.layers = layers
+        self.loss = []
 
         self.W1 = []
         self.W2 = []
@@ -15,7 +16,6 @@ class NeuralNetwork:
         self.b2 = []
         self.b3 = []
 
-        
     def init_weights_and_biases(self, X, layers):
         # He initialisation
         W1 = np.random.randn(layers[0], X.shape[0]) * np.sqrt(2.0/X.shape[0])
@@ -51,7 +51,6 @@ class NeuralNetwork:
         return np.argmax(A2, axis=0)
 
     def incorrect_predictions(self, X, Y, Y_hat):
-        
         incorrect_images = []
         incorrect_labels = []
         
@@ -62,9 +61,15 @@ class NeuralNetwork:
 
         return incorrect_images, incorrect_labels
                 
-
     def accuracy(self, Y, Y_hat):
         return np.mean(Y == Y_hat)
+    
+    def plot_loss(self):
+        plt.plot(self.loss, color = 'r')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title('Loss vs epochs')
+        plt.show()
 
     def dense(self, a_in, W, b, activation):
         z = W.dot(a_in) + b
@@ -115,12 +120,13 @@ class NeuralNetwork:
             a1, a2, a3, z1, z2, _ = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
             dW1, db1, dW2, db2, dW3, db3 = self.back_prop(z1, a1, z2, a2, W2, a3, W3, X, Y)
             W1, b1, W2, b2, W3, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
+            self.loss.append(self.categorical_cross_entropy(self.one_hot(Y), a3))
             if(i % 10 == 0):
                 print('Epoch: ', i)
                 print('Accuracy: ', self.accuracy(Y, self.predictions(a3)))
                 print('Loss: ', self.categorical_cross_entropy(self.one_hot(Y), a3))
         print('Accuracy after training: ', self.accuracy(Y, self.predictions(a3)))
-
+       
         # save the post-training weights and biases
         self.W1 = W1
         self.W2 = W2
@@ -151,8 +157,7 @@ def main():
                                 neural_network.W1, neural_network.W2, neural_network.W3,
                                   neural_network.b1, neural_network.b2, neural_network.b3)
     
-    incorrect_images, incorrect_labels = neural_network.incorrect_predictions(x_test, y_test, neural_network.predictions(neural_network.forward_prop(x_test, neural_network.W1, neural_network.b1, neural_network.W2, neural_network.b2, neural_network.W3, neural_network.b3)[2]))
-    mnist_data_handler.plot_images(incorrect_images[:10], incorrect_labels[:10])
+    neural_network.plot_loss()
 
     plt.show()
 
