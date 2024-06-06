@@ -5,7 +5,7 @@
 - [Activation Functions](#activation-functions)
 - [Loss Function](#loss-function)
 - [Back Propagation](#back-propagation)
-- [He Initialization](#he-initialization)
+- [He Initialisation](#he-initialisation)
 - [Analysing Results](#analysing-results)
 
 ## Mnist Database
@@ -49,7 +49,7 @@ $$
 ### Categorical Cross Entropy Loss
 
 $$
-Loss = -\sum_{i=1}^H y_i \cdot \log \hat{y}
+L = -\sum_{i=1}^H y_i \cdot \log \hat{y}
 $$
 
 Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the predicted label.
@@ -57,7 +57,7 @@ Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the pr
 
 ### Deriving $\frac{\delta L}{\delta z_k}$
 
-We know that 
+By the previously stated definition of Categorical Cross Entropy Loss
 
 $$
 L = -\sum_{i=1} y_i \log(o_i)
@@ -133,12 +133,19 @@ $$
 \end{align*}
 $$
 
-## He Initialization
+## He Initialisation
 
+Weights cannot be initialised to 0. Since $a = \overline{w}X + b$ $\overline{w}=0$ would result in every neuron outputting 0 and all neurons outputting the same value, regardless of input (symmetry).
 
+For this model, He initialisation is used and is defined as follows:
 
-He Initialization
+$$
+W \sim N(0, \sqrt{\frac{2}{n_{in}}})
+$$
 
+This denotes a normal distribution with mean $0$ and standard deviation $\sqrt{\frac{2}{n_{in}}}$ where $n_{in}$ represents the number of input units to the layer.
+
+Using He initialisation reduces the chances of gradients 'vanishing' or 'exploding' during backpropagation and also leads to faster convergence. It is particularly suited for neural networks utilising the ReLU activation function.
 ## Analysing Results
 
 Analysing results
