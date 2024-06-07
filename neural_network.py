@@ -16,6 +16,14 @@ class NeuralNetwork:
         self.b2 = []
         self.b3 = []
 
+        self.vW1 = []
+        self.vW2 = []
+        self.vW3 = []
+
+        self.vb1 = []
+        self.vb2 = []
+        self.vb3 = []
+
     def init_weights_and_biases(self, X, layers):
         # He initialisation
         W1 = np.random.randn(layers[0], X.shape[0]) * np.sqrt(2.0/X.shape[0])
@@ -26,7 +34,19 @@ class NeuralNetwork:
         b2 = np.zeros((layers[1], 1))
         b3 = np.zeros((layers[2], 1))
 
-        return W1, b1, W2, b2, W3, b3
+        return W1, W2, W3, b1, b2, b3
+    
+    def init_velocities(self, W1, W2, W3, b1, b2, b3):
+
+        vW1 = np.zeros_like(W1)
+        vW2 = np.zeros_like(W2)
+        vW3 = np.zeros_like(W3)
+
+        vb1 = np.zeros_like(b1)
+        vb2 = np.zeros_like(b2)
+        vb3 = np.zeros_like(b3)
+
+        return vW1, vW2, vW3, vb1, vb2, vb3
 
     def relu(self, Z):
         return np.maximum(0, Z)
@@ -104,22 +124,53 @@ class NeuralNetwork:
         return dW1, db1, dW2, db2, dW3, db3
 
     def update_params(self, W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha):
-
         W1 -= alpha * dW1
-        b1 -= alpha * db1
         W2 -= alpha * dW2
-        b2 -= alpha * db2
         W3 -= alpha * dW3
+
+        b1 -= alpha * db1
+        b2 -= alpha * db2
         b3 -= alpha * db3
 
-        return W1, b1, W2, b2, W3, b3
-            
-    def training_loop(self, X, Y, epochs, alpha):
-        W1, b1, W2, b2, W3, b3 = self.init_weights_and_biases(X, self.layers)
+        return W1, W2, W3, b1, b2, b3
+    
+    def update_params_with_velocity(self, W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha):
+        W1 = W1 - alpha * dW1
+        W2 = W2 - alpha * dW2
+        W3 = W3 - alpha * dW3
+
+        b1 = b1 - alpha * db1
+        b2 = b2 - alpha * db2
+        b3 = b3 - alpha * db3 
+
+        return W1, W2, W3, b1, b2, b3
+    
+    def update_velocity_params(self, vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1):
+        vW1 = beta1 * vW1 + (1 - beta1) * dW1
+        vW2 = beta1 * vW2 + (1 - beta1) * dW2
+        vW3 = beta1 * vW3 + (1 - beta1) * dW3
+
+        vb1 = beta1 * vb1 + (1 - beta1) * db1
+        vb2 = beta1 * vb2 + (1 - beta1) * db2
+        vb3 = beta1 * vb3 + (1 - beta1) * db3
+        
+        return vW1, vW2, vW3, vb1, vb2, vb3
+
+    def training_loop(self, X, Y, epochs, alpha, momentum_applied):
+        W1, W2, W3, b1, b2, b3 = self.init_weights_and_biases(X, self.layers)
+        if(momentum_applied):
+            vW1, vW2, vW3, vb1, vb2, vb3 = self.init_velocities(W1, W2, W3, b1, b2, b3)
+
         for i in range(epochs):
             a1, a2, a3, z1, z2, _ = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
             dW1, db1, dW2, db2, dW3, db3 = self.back_prop(z1, a1, z2, a2, W2, a3, W3, X, Y)
-            W1, b1, W2, b2, W3, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
+
+            if (momentum_applied):
+                vW1, vW2, vW3, vb1, vb2, vb3 = self.update_velocity_params(vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1=0.9)
+                W1, W2, W3, b1, b2, b3 = self.update_params_with_velocity(W1, b1, W2, b2, W3, b3, vW1, vb1, vW2, vb2, vW3, vb3, alpha)
+            else:
+                W1, W2, W3, b1, b2, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
+
             self.loss.append(self.categorical_cross_entropy(self.one_hot(Y), a3))
             if(i % 10 == 0):
                 print('Epoch: ', i)
@@ -146,8 +197,8 @@ def main():
     x_train = x_train.T
     x_train = mnist_data_handler.normalise(x_train)
 
-    neural_network = NeuralNetwork([40, 20, 10])
-    neural_network.training_loop(x_train, y_train, 200, 0.5)
+    neural_network = NeuralNetwork(layers=[40, 20, 10])
+    neural_network.training_loop(x_train, y_train, epochs=200, alpha=0.5, momentum_applied=True)
 
     x_test, y_test = mnist_data_handler.load_test_data()
     x_test = x_test.T
