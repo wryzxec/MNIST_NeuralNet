@@ -147,7 +147,7 @@ $$
 
 ## He Initialisation
 
-Weights cannot be initialised to 0. Since $a = \overline{w}X + b$ $\overline{w}=0$ would result in every neuron outputting 0 and all neurons outputting the same value, regardless of input (symmetry).
+Weights cannot be initialised to 0. Since $a = \overline{w}X + b =0$ would result in every neuron outputting 0 and all neurons outputting the same value, regardless of input (symmetry).
 
 For this model, He initialisation is used and is defined as follows:
 
