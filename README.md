@@ -3,6 +3,7 @@
 - [MNIST Database](#mnist-database)
 - [Network Structure](#network-structure)
 - [Activation Functions](#activation-functions)
+- [One-Hot Encoding](#one-hot-encoding)
 - [Loss Function](#loss-function)
 - [Back Propagation](#back-propagation)
 - [He Initialisation](#he-initialisation)
@@ -44,9 +45,20 @@ $$
 Softmax(z_i) = \frac{e^{z_i}}{\sum_k e^{z_k}}
 $$
 
+## One-Hot Encoding
+When representing the categorical output data $y$ we can use one-hot encoding. This involves representing the data as a binary vector.
+
+For example, we can encode the number $3$ as 
+
+$$
+\[0,0,0,1,0,0,0,0,0,0\]
+$$
+
+Here, each number (0-9) can be represented by simply setting it's respective index (starting from 0) to 1 and all others to 0. This works particularly well when paired with the softmax and categorical cross-entropy loss function.
+
 ## Loss Function
 
-### Categorical Cross Entropy Loss
+### Categorical Cross-Entropy Loss
 
 $$
 L = -\sum_{i=1}^H y_i \cdot \log \hat{y}
@@ -55,7 +67,7 @@ $$
 Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the predicted label.
 ## Back Propagation
 
-### Deriving $\frac{\delta L}{\delta z_k}$
+### Deriving the derivative of the ouput layer $\left(\frac{\delta L}{\delta z_k}\right)$
 
 By the previously stated definition of Categorical Cross Entropy Loss
 
