@@ -155,6 +155,32 @@ class NeuralNetwork:
         vb3 = beta1 * vb3 + (1 - beta1) * db3
         
         return vW1, vW2, vW3, vb1, vb2, vb3
+    
+    def create_mini_batches(self, X, Y, batch_size):
+        mini_batches = []
+
+        data = np.vstack((X, Y))
+        
+        indices_permutation = np.random.permutation(data.shape[1])
+        data = data[:, indices_permutation]
+
+        n_minibatches = data.shape[1] // batch_size
+
+        for i in range(n_minibatches):
+            mini_batch = data[:, i * batch_size : (i + 1) * batch_size]
+            X_mini = mini_batch[:-1, :]
+            Y_mini = mini_batch[-1, :]
+
+            mini_batches.append((X_mini, Y_mini))
+
+        if data.shape[1] % batch_size != 0:
+            mini_batch = data[:, n_minibatches * batch_size : data.shape[1]]
+            X_mini = mini_batch[:-1, :]
+            Y_mini = mini_batch[-1, :]
+
+            mini_batches.append((X_mini, Y_mini))
+
+        return mini_batches
 
     def training_loop(self, X, Y, epochs, alpha, momentum_applied):
         W1, W2, W3, b1, b2, b3 = self.init_weights_and_biases(X, self.layers)
@@ -162,21 +188,27 @@ class NeuralNetwork:
             vW1, vW2, vW3, vb1, vb2, vb3 = self.init_velocities(W1, W2, W3, b1, b2, b3)
 
         for i in range(epochs):
-            a1, a2, a3, z1, z2, _ = self.forward_prop(X, W1, b1, W2, b2, W3, b3)
-            dW1, db1, dW2, db2, dW3, db3 = self.back_prop(z1, a1, z2, a2, W2, a3, W3, X, Y)
 
-            if (momentum_applied):
-                vW1, vW2, vW3, vb1, vb2, vb3 = self.update_velocity_params(vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1=0.9)
-                W1, W2, W3, b1, b2, b3 = self.update_params_with_velocity(W1, b1, W2, b2, W3, b3, vW1, vb1, vW2, vb2, vW3, vb3, alpha)
-            else:
-                W1, W2, W3, b1, b2, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
+            mini_batches = self.create_mini_batches(X, Y, 4096)
+            for mini_batch in mini_batches:
+                X_mini, Y_mini = mini_batch
 
-            self.loss.append(self.categorical_cross_entropy(self.one_hot(Y), a3))
+                a1, a2, a3, z1, z2, _ = self.forward_prop(X_mini, W1, b1, W2, b2, W3, b3)
+                dW1, db1, dW2, db2, dW3, db3 = self.back_prop(z1, a1, z2, a2, W2, a3, W3, X_mini, Y_mini)
+
+                if (momentum_applied):
+                    vW1, vW2, vW3, vb1, vb2, vb3 = self.update_velocity_params(vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1=0.9)
+                    W1, W2, W3, b1, b2, b3 = self.update_params_with_velocity(W1, b1, W2, b2, W3, b3, vW1, vb1, vW2, vb2, vW3, vb3, alpha)
+                else:
+                    W1, W2, W3, b1, b2, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
+
+            self.loss.append(self.categorical_cross_entropy(self.one_hot(Y_mini), a3))
             if(i % 10 == 0):
                 print('Epoch: ', i)
-                print('Accuracy: ', self.accuracy(Y, self.predictions(a3)))
-                print('Loss: ', self.categorical_cross_entropy(self.one_hot(Y), a3))
-        print('Accuracy after training: ', self.accuracy(Y, self.predictions(a3)))
+                print('Accuracy: ', self.accuracy(Y_mini, self.predictions(a3)))
+                print('Loss: ', self.categorical_cross_entropy(self.one_hot(Y_mini), a3))
+
+        print('Accuracy after training: ', self.accuracy(Y_mini, self.predictions(a3)))
        
         # save the post-training weights and biases
         self.W1 = W1
@@ -197,8 +229,8 @@ def main():
     x_train = x_train.T
     x_train = mnist_data_handler.normalise(x_train)
 
-    neural_network = NeuralNetwork(layers=[40, 20, 10])
-    neural_network.training_loop(x_train, y_train, epochs=200, alpha=0.5, momentum_applied=True)
+    neural_network = NeuralNetwork(layers=[60, 40, 10])
+    neural_network.training_loop(x_train, y_train, epochs=100, alpha=0.8, momentum_applied=True)
 
     x_test, y_test = mnist_data_handler.load_test_data()
     x_test = x_test.T
