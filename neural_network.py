@@ -37,7 +37,6 @@ class NeuralNetwork:
         return W1, W2, W3, b1, b2, b3
     
     def init_velocities(self, W1, W2, W3, b1, b2, b3):
-
         vW1 = np.zeros_like(W1)
         vW2 = np.zeros_like(W2)
         vW3 = np.zeros_like(W3)
@@ -63,14 +62,13 @@ class NeuralNetwork:
         return np.array([i == Y for i in range(10)])
     
     def categorical_cross_entropy(self, Y, Y_hat):
-        # Avoid numerical instability by clipping values
-        Y_hat = np.clip(Y_hat, 1e-15, 1 - 1e-15)
+        Y_hat = np.clip(Y_hat, 1e-15, 1 - 1e-15) # Avoid numerical instability by clipping values
         return -np.mean(np.sum(Y * np.log(Y_hat), axis=1))
 
     def predictions(self, A2):
         return np.argmax(A2, axis=0)
 
-    def incorrect_predictions(self, X, Y, Y_hat):
+    def get_incorrect_prediction_images_and_labels(self, X, Y, Y_hat):
         incorrect_images = []
         incorrect_labels = []
         
@@ -82,15 +80,9 @@ class NeuralNetwork:
         return incorrect_images, incorrect_labels
                 
     def accuracy(self, Y, Y_hat):
-        return np.mean(Y == Y_hat)
+        total_correct = np.sum(Y == Y_hat)
+        return total_correct / Y.size
     
-    def plot_loss(self):
-        plt.plot(self.loss, color = 'r')
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.title('Loss vs epochs')
-        plt.show()
-
     def dense(self, a_in, W, b, activation):
         z = W.dot(a_in) + b
         if(activation == 'relu'):   
@@ -134,17 +126,6 @@ class NeuralNetwork:
 
         return W1, W2, W3, b1, b2, b3
     
-    def update_params_with_velocity(self, W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha):
-        W1 = W1 - alpha * dW1
-        W2 = W2 - alpha * dW2
-        W3 = W3 - alpha * dW3
-
-        b1 = b1 - alpha * db1
-        b2 = b2 - alpha * db2
-        b3 = b3 - alpha * db3 
-
-        return W1, W2, W3, b1, b2, b3
-    
     def update_velocity_params(self, vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1):
         vW1 = beta1 * vW1 + (1 - beta1) * dW1
         vW2 = beta1 * vW2 + (1 - beta1) * dW2
@@ -182,14 +163,14 @@ class NeuralNetwork:
 
         return mini_batches
 
-    def training_loop(self, X, Y, epochs, alpha, momentum_applied):
+    def training_loop(self, X, Y, epochs, alpha, momentum_applied, batch_size):
         W1, W2, W3, b1, b2, b3 = self.init_weights_and_biases(X, self.layers)
         if(momentum_applied):
             vW1, vW2, vW3, vb1, vb2, vb3 = self.init_velocities(W1, W2, W3, b1, b2, b3)
 
         for i in range(epochs):
 
-            mini_batches = self.create_mini_batches(X, Y, 4096)
+            mini_batches = self.create_mini_batches(X, Y, batch_size)
             for mini_batch in mini_batches:
                 X_mini, Y_mini = mini_batch
 
@@ -198,17 +179,22 @@ class NeuralNetwork:
 
                 if (momentum_applied):
                     vW1, vW2, vW3, vb1, vb2, vb3 = self.update_velocity_params(vW1, vb1, vW2, vb2, vW3, vb3, dW1, db1, dW2, db2, dW3, db3, beta1=0.9)
-                    W1, W2, W3, b1, b2, b3 = self.update_params_with_velocity(W1, b1, W2, b2, W3, b3, vW1, vb1, vW2, vb2, vW3, vb3, alpha)
+                    W1, W2, W3, b1, b2, b3 = self.update_params(W1, b1, W2, b2, W3, b3, vW1, vb1, vW2, vb2, vW3, vb3, alpha)
                 else:
                     W1, W2, W3, b1, b2, b3 = self.update_params(W1, b1, W2, b2, W3, b3, dW1, db1, dW2, db2, dW3, db3, alpha)
 
-            self.loss.append(self.categorical_cross_entropy(self.one_hot(Y_mini), a3))
-            if(i % 10 == 0):
-                print('Epoch: ', i)
-                print('Accuracy: ', self.accuracy(Y_mini, self.predictions(a3)))
-                print('Loss: ', self.categorical_cross_entropy(self.one_hot(Y_mini), a3))
 
-        print('Accuracy after training: ', self.accuracy(Y_mini, self.predictions(a3)))
+            loss = self.categorical_cross_entropy(self.one_hot(Y_mini), a3)
+            accuracy = self.accuracy(Y_mini, self.predictions(a3))
+            
+            self.loss.append(loss)
+
+            print(f"Epoch: {i+1}/{epochs}")
+            print('Training Accuracy: ', accuracy.round(4))
+            print('Loss: ', loss.round(4))
+            print('------------------------------')
+
+        print('Final Training Accuracy: ', self.accuracy(Y_mini, self.predictions(a3)))
        
         # save the post-training weights and biases
         self.W1 = W1
@@ -229,8 +215,8 @@ def main():
     x_train = x_train.T
     x_train = mnist_data_handler.normalise(x_train)
 
-    neural_network = NeuralNetwork(layers=[60, 40, 10])
-    neural_network.training_loop(x_train, y_train, epochs=100, alpha=0.8, momentum_applied=True)
+    neural_network = NeuralNetwork(layers=[100, 50, 10])
+    neural_network.training_loop(x_train, y_train, epochs=20, alpha=0.5, momentum_applied=True, batch_size=60000)
 
     x_test, y_test = mnist_data_handler.load_test_data()
     x_test = x_test.T
@@ -240,7 +226,13 @@ def main():
                                 neural_network.W1, neural_network.W2, neural_network.W3,
                                   neural_network.b1, neural_network.b2, neural_network.b3)
     
-    neural_network.plot_loss()
+
+    network_raw_output = neural_network.forward_prop(x_test, neural_network.W1, neural_network.b1, neural_network.W2, neural_network.b2, neural_network.W3, neural_network.b3)[2]
+    predictions = neural_network.predictions(network_raw_output)
+
+    incorrect_images, incorrect_labels = neural_network.get_incorrect_prediction_images_and_labels(x_test, y_test, predictions)
+    
+    mnist_data_handler.plot_images(incorrect_images[:10], incorrect_labels[:10])
 
     plt.show()
 
