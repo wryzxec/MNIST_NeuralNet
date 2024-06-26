@@ -1,10 +1,13 @@
 # MNIST Neural Network with NumPy
 
 - [MNIST Database](#mnist-database)
+- [Overview on How the Nework Learns](#overview-on-how-the-network-learns)
 - [Network Structure](#network-structure)
 - [Activation Functions](#activation-functions)
 - [One-Hot Encoding](#one-hot-encoding)
 - [Loss Function](#loss-function)
+- [Mini-Batch Gradient Descent](#mini-batch-gradient-descent)
+- [Gradient Descent with Momentum](#gradient-descent-with-momentum)
 - [Back Propagation](#back-propagation)
 - [He Initialisation](#he-initialisation)
 - [Analysing Results](#analysing-results)
@@ -17,8 +20,17 @@ Each image is black and white, 28x28 pixels in size, and contains a singular han
 ![MNIST Example Images](assets/MNIST_Examples.png)
 
 
-## Network Structure
+## Overview on How the Network Learns
 
+1. **Initialisation**: The networks weights and biases are initialised.
+3. **Forward Propagation**: The input data is passed through the network and predictions are obtained.
+4. **Computing Loss**: The predictions are passed through the loss function to measure the accuracy of the network.
+5. **Backward Propagation**: Using partial derivatives, compute the gradient of the loss function with respect to each weight and bias in the network.
+6. **Update Parameters**: Update the weights and biases, opposing the direction of the gradient, to reach a point of minimum loss.
+7. **Repeat steps 2-5**.
+
+
+## Network Structure
 This image is a simplified version of the networks architecture. It contains an input layer, hidden layers and an output layer. One important thing to note is that the output contains 10 different nodes. These correspond to the 10 digits (0-9) that the network is attempting to classify.
 
 The ReLU functions in the hidden layers introduce non-linearity and a softmax function is applied to the output to convert the raw output (logits) to probabilities, which sum to 1.
@@ -65,6 +77,33 @@ L = -\sum_{i=1}^H y_i \cdot \log \hat{y}
 $$
 
 Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the predicted label.
+
+## Mini-Batch Gradient Descent
+
+Mini-batch gradient descent is a variation of the gradient descent algorithm that splits the training dataset into small batches. Data is processed in batches and this means that the weights are updated with each batch, unlike batch gradient descent where the traning set is processed as a whole unit.
+
+## Gradient Descent with Momentum
+
+Gradient Descent with Momentum is an optimisation technique which allows for the network to converge faster to the optimal solution. This is done by calculating an exponentially weighted average of the gradients and then this averaged gradient is used to update the weights and biases.
+
+**Velocity Parameter Update**
+
+$$
+\begin{align*}
+V_{\delta w} &:= \beta \cdot V_{\delta w} + (1-\beta)\cdot \delta w\\
+V_{\delta b} &:= \beta \cdot V_{\delta b} + (1-\beta)\cdot \delta b
+\end{align*}
+$$
+
+**Weight and Bias Update**
+
+$$
+\begin{align*}
+w &:= w-\alpha V_{\delta w}\\
+b &:= b-\alpha V_{\delta b}
+\end{align*}
+$$
+
 ## Back Propagation
 
 ### Deriving the derivative of the ouput layer $\left(\frac{\delta L}{\delta z_k}\right)$
@@ -140,7 +179,7 @@ Therefore
 $$
 \begin{align*}
 \frac{\delta L}{\delta z_k} &= -\left[-o_k(1-y_k) + y_k(1-o_k)\right]\\
-&= -\left[-o_k + o_k\cdot y_k + y_k -o_k\cdot y_k)\right]\\
+&= -\left[-o_k + o_k\cdot y_k + y_k -o_k\cdot y_k\right]\\
 &= o_k - y_k
 \end{align*}
 $$
