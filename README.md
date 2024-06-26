@@ -19,6 +19,7 @@ Each image is black and white, 28x28 pixels in size, and contains a singular han
 
 ![MNIST Example Images](assets/MNIST_Examples.png)
 
+For the purpose of this network, 60,000 images are reserved for training and the remaining 10,000 are used for testing the network on unseen images.
 
 ## Overview on How the Network Learns
 
@@ -73,14 +74,14 @@ Here, each number (0-9) can be represented by simply setting it's respective ind
 ### Categorical Cross-Entropy Loss
 
 $$
-L = -\sum_{i=1}^H y_i \cdot \log \hat{y}
+L = -\sum_{i=1}^H y_i \cdot \log \hat{y_i}
 $$
 
 Where $H$ is the number of 'categories', $y$ the true label and $\hat{y}$ the predicted label.
 
 ## Mini-Batch Gradient Descent
 
-Mini-batch gradient descent is a variation of the gradient descent algorithm that splits the training dataset into small batches. Data is processed in batches and this means that the weights are updated with each batch, unlike batch gradient descent where the traning set is processed as a whole unit.
+Mini-batch gradient descent is a variation of the gradient descent algorithm that splits the training dataset into small batches. When data is processed in these small batches it means that the weights and biases are updated with each mini-batch, unlike batch gradient descent where the traning set is processed as a whole unit.
 
 ## Gradient Descent with Momentum
 
