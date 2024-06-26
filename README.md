@@ -199,4 +199,15 @@ This denotes a normal distribution with mean $0$ and standard deviation $\sqrt{\
 Using He initialisation reduces the chances of gradients 'vanishing' or 'exploding' during backpropagation and also leads to faster convergence. It is particularly suited for neural networks utilising the ReLU activation function.
 ## Analysing Results
 
-Analysing results
+<div align="center">
+
+| Epochs | Mini-Batch Size | Neurons (Layer1/Layer2/Layer3) | Learning Rate | Momentum Applied (True/False) | Accuracy (%) |
+|----------|----------|----------|----------|----------|----------|
+| 20 | 128 | 100/50/10 | 0.5 | True | 98.14 |
+| 20 | 128 | 100/50/10 | 0.5 | False | 97.51 |
+| 20 | 60,000 | 100/50/10 | 0.5 | True | 84.13 |
+| 20 | 60,000 | 100/50/10 | 0.5 | False | 65.16 |
+
+</div>
+
+*Note:* A mini-batch size of 60,000 just means that batch gradient descent is being used over mini-batch gradient descent.
