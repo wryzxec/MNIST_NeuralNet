@@ -55,7 +55,6 @@ class NeuralNetwork:
             self.layers[i].A = a_i
 
         # propagate through the ouput layer 
-
         z_i, a_i = self.layers[-1].dense(self.layers[-2].A, self.layers[-1].W, self.layers[-1].b, softmax)
         self.layers[-1].Z = z_i
         self.layers[-1].A = a_i
@@ -116,13 +115,17 @@ class NeuralNetwork:
     def accuracy(self, Y, Y_hat):
         total_correct = np.sum(Y == Y_hat)
         return total_correct / Y.size
+    
+    def run_testing(self, X, Y):
+        self.forward_prop(X)
+        accuracy = self.accuracy(Y, self.predictions(self.layers[-1].A))
+        print('Testing Accuracy: ', accuracy)
 
 def main():
     mnist_data_handler = MnistDataHandler()
     
     network_config = NetworkConfig(
-        layer_architecture = [40, 30, 20, 10],
-        epochs = 100,
+        layer_architecture = [200, 100, 25, 10],
         momentum_applied=True
     )
     neural_network = NeuralNetwork(network_config)
@@ -132,6 +135,12 @@ def main():
     X_train = mnist_data_handler.normalise(X_train)
 
     neural_network.training_loop(X_train, Y_train, network_config)
+
+    X_Test, Y_Test = mnist_data_handler.load_test_data()
+    X_Test = X_Test.T
+    X_Test = mnist_data_handler.normalise(X_Test)
+
+    neural_network.run_testing(X_Test, Y_Test)
 
 if __name__ == "__main__":
     main()
