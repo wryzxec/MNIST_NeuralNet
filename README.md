@@ -204,6 +204,7 @@ Using He initialisation reduces the chances of gradients 'vanishing' or 'explodi
 
 | Epochs | Mini-Batch Size | Neurons (Layer1/Layer2/Layer3) | Learning Rate | Momentum Applied (True/False) | Accuracy (%) |
 |----------|----------|----------|----------|----------|----------|
+| 20 | 128 | 200/100/25/10 | 0.5 | True | 98.42 |
 | 20 | 128 | 100/50/10 | 0.5 | True | 98.14 |
 | 20 | 128 | 100/50/10 | 0.5 | False | 97.51 |
 | 20 | 60,000 | 100/50/10 | 0.5 | True | 84.13 |
