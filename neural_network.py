@@ -35,7 +35,7 @@ class NeuralNetwork:
             hidden_layer = Layer(units)
             hidden_layer.init_weights_and_biases(input_units)
             if network_config.momentum_applied:
-                self.first_hidden_layer.init_velocities()
+                hidden_layer.init_velocities()
             self.layers.append(hidden_layer)
 
     def forward_prop(self, X):
@@ -93,15 +93,21 @@ class NeuralNetwork:
     def training_loop(self, X, Y, network_config):
 
         for i in range(network_config.epochs):
-            self.forward_prop(X)
-            self.backward_prop(X, Y)
 
-            for layer in self.layers:
-                layer.update_weights_biases(network_config.alpha)
-                if network_config.momentum_applied:
-                    layer.update_velocities(network_config.beta)
+            mini_batches = MnistDataHandler().create_mini_batches(X, Y, network_config.batch_size)
+
+            for mini_batch in mini_batches:
+                X_mini, Y_mini = mini_batch
+
+                self.forward_prop(X_mini)
+                self.backward_prop(X_mini, Y_mini)
+
+                for layer in self.layers:
+                    layer.update_weights_biases(network_config.alpha)
+                    if network_config.momentum_applied:
+                        layer.update_velocities(network_config.beta)
         
-            accuracy = self.accuracy(Y, self.predictions(self.layers[-1].A))
+            accuracy = self.accuracy(Y_mini, self.predictions(self.layers[-1].A))
             print('Epoch: ', i, ' Accuracy: ', accuracy)
 
     def predictions(self, A_out):
@@ -117,6 +123,7 @@ def main():
     network_config = NetworkConfig(
         layer_architecture = [40, 30, 20, 10],
         epochs = 100,
+        momentum_applied=True
     )
     neural_network = NeuralNetwork(network_config)
 

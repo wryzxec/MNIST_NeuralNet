@@ -55,8 +55,33 @@ class MnistDataHandler:
 
         return x_test, y_test
     
-    def plot_images(self, images, title_texts):
+    def create_mini_batches(self, X, Y, batch_size):
+        mini_batches = []
 
+        data = np.vstack((X, Y))
+        
+        indices_permutation = np.random.permutation(data.shape[1])
+        data = data[:, indices_permutation]
+
+        n_minibatches = data.shape[1] // batch_size
+
+        for i in range(n_minibatches):
+            mini_batch = data[:, i * batch_size : (i + 1) * batch_size]
+            X_mini = mini_batch[:-1, :]
+            Y_mini = mini_batch[-1, :]
+
+            mini_batches.append((X_mini, Y_mini))
+
+        if data.shape[1] % batch_size != 0:
+            mini_batch = data[:, n_minibatches * batch_size : data.shape[1]]
+            X_mini = mini_batch[:-1, :]
+            Y_mini = mini_batch[-1, :]
+
+            mini_batches.append((X_mini, Y_mini))
+
+        return mini_batches
+
+    def plot_images(self, images, title_texts):
         images = np.reshape(images, (np.shape(images)[0], 28, 28))
 
         cols = 5
@@ -80,25 +105,3 @@ class MnistDataHandler:
             index += 1
         
         return images_plot
-    
-    def generate_random_training_samples(self, sample_count, x_train, y_train):
-        
-        images_to_show = []
-        titles_to_show = []
-        for i in range(0, sample_count):
-            r = random.randint(1, 60000)
-            images_to_show.append(x_train[r])
-            titles_to_show.append('y = ' + str(y_train[r]))
-
-        return images_to_show, titles_to_show
-
-def main(): 
-    mnist_data_handler = MnistDataHandler()
-    x_train, y_train = mnist_data_handler.load_training_data()
-    images_to_show, titles_to_show = mnist_data_handler.generate_random_training_samples(20, x_train, y_train)
-    mnist_data_handler.plot_images(images_to_show, titles_to_show)
-
-    plt.show()
-
-if __name__ == "__main__":
-    main()
