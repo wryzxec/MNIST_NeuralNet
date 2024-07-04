@@ -1,7 +1,42 @@
 import numpy as np
 
 class Layer:
+    """
+    Represents a neural network layer.
+
+    Attributes
+    ----------
+    units : int
+        The number of units (neurons) in the layer.
+    W : ndarray or None
+        The weights of the layer.
+    b : ndarray or None
+        The biases of the layer.
+    A : ndarray or None
+        The output of the activation function, applied to Z, computed during forward propagation.
+    Z : ndarray or None
+        The linear combination output (before activation) of the layer.
+    vW : ndarray or None
+        The velocity of weights for SGD with momentum.
+    vb : ndarray or None
+        The velocity of biases for SGD with momentum.
+    dZ : ndarray or None
+        The gradient of the cost with respect to Z.
+    dW : ndarray or None
+        The gradient of the cost with respect to W.
+    db : ndarray or None
+        The gradient of the cost with respect to b.
+    """
+
     def __init__(self, units):
+        """
+        Parameters
+        ----------
+        units : int
+            The number of units (neurons) in the layer.
+
+        """
+            
         self.units = units
         
         self.W = None
