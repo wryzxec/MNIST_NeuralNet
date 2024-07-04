@@ -1,16 +1,25 @@
+<div align="center">
+
 # MNIST Neural Network with NumPy
 
-- [MNIST Database](#mnist-database)
-- [Overview on How the Nework Learns](#overview-on-how-the-network-learns)
-- [Network Structure](#network-structure)
-- [Activation Functions](#activation-functions)
-- [One-Hot Encoding](#one-hot-encoding)
-- [Loss Function](#loss-function)
-- [Mini-Batch Gradient Descent](#mini-batch-gradient-descent)
-- [Gradient Descent with Momentum](#gradient-descent-with-momentum)
-- [Back Propagation](#back-propagation)
-- [He Initialisation](#he-initialisation)
-- [Analysing Results](#analysing-results)
+A Neural Network, trained on the MNIST database, with the task of classifying handwritten digits. Made without the use of ML libraries such as TensorFlow or Pytorch, only using NumPy. Currently runs with a 98% Accuracy!
+
+</div>
+
+## Contents ##
+&rightarrow; [MNIST Database](#mnist-database)\
+&rightarrow; [Overview on How the Nework Learns](#overview-on-how-the-network-learns)\
+&rightarrow; [Network Structure](#network-structure)\
+&rightarrow; [Activation Functions](#activation-functions)\
+&rightarrow; [One-Hot Encoding](#one-hot-encoding)\
+&rightarrow; [Loss Function](#loss-function)\
+&rightarrow; [Mini-Batch Gradient Descent](#mini-batch-gradient-descent)\
+&rightarrow; [Gradient Descent with Momentum](#gradient-descent-with-momentum)\
+&rightarrow; [Back Propagation](#back-propagation)\
+&rightarrow; [He Initialisation](#he-initialisation)\
+&rightarrow; [Analysing Results](#analysing-results)
+
+
 
 ## Mnist Database
 The MNIST database is a large database, containing 70,000 images of handwritten digits.
@@ -202,8 +211,9 @@ Using He initialisation reduces the chances of gradients 'vanishing' or 'explodi
 
 <div align="center">
 
-| Epochs | Mini-Batch Size | Neurons (Layer1/Layer2/Layer3) | Learning Rate | Momentum Applied (True/False) | Accuracy (%) |
+| Epochs | Mini-Batch Size | Neurons (Layer1/Layer2/.../Layer n) | Learning Rate | Momentum Applied (True/False) | Accuracy (%) |
 |----------|----------|----------|----------|----------|----------|
+| 20 | 128 | 200/100/25/10 | 0.5 | True | 98.42 |
 | 20 | 128 | 100/50/10 | 0.5 | True | 98.14 |
 | 20 | 128 | 100/50/10 | 0.5 | False | 97.51 |
 | 20 | 60,000 | 100/50/10 | 0.5 | True | 84.13 |
