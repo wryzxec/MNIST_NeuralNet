@@ -116,7 +116,7 @@ $$
 
 ## Back Propagation
 
-### Deriving the derivative of the ouput layer $\left(\frac{\delta L}{\delta z_k}\right)$
+### Deriving $\left(\frac{\delta L}{\delta z_k}\right)$
 
 By the previously stated definition of Categorical Cross Entropy Loss
 
@@ -193,6 +193,68 @@ $$
 &= o_k - y_k
 \end{align*}
 $$
+
+Which is implemented in the code as
+```python
+self.layers[-1].dZ = self.layers[-1].A - one_hot(Y)
+```
+
+### Deriving $\left(\frac{\delta L}{\delta W_k} \right)$
+
+By the chain rule
+
+$$
+\frac{\delta L}{\delta W_k} = \frac{\delta L}{\delta z_k} \cdot \frac{\delta z_k}{\delta W_k}
+$$
+
+Since $z_k = A_{k-1}\cdot W_k + b_k$
+
+$$
+\begin{align*}
+\frac{\delta z_k}{\delta W_k} &= \frac{\delta}{\delta W_k}(A_{k-1}\cdot W_k + b_k)\\
+&= A_{k-1}
+\end{align*}
+$$
+
+We must consider all of the gradients in the layer so we divide by the total number ($m$) and get the resulting equation
+
+$$
+\frac{\delta L}{\delta W_k} = \frac{1}{m} \cdot \frac{\delta L}{\delta z_k} \cdot A_{k-1}^T
+$$
+
+Which is implemented in the code as
+```python
+self.layers[-1].dW = 1/m * self.layers[-1].dZ.dot(self.layers[-2].A.T)
+```
+
+### Deriving $\left(\frac{\delta L}{\delta b_k}\right)$
+
+By the chain rule
+
+$$
+\frac{\delta L}{\delta b_k} = \frac{\delta L}{\delta z_k} \cdot \frac{\delta z_k}{\delta b_k}
+$$
+
+Since $z_k = A_{k-1}\cdot W_k + b_k$
+
+$$
+\begin{align*}
+\frac{\delta L}{\delta b_k} &= \frac{\delta L}{\delta z_k} \cdot \frac{\delta}{\delta b_k}(A_{k-1}\cdot W_k + b_k)\\
+&= \frac{\delta L}{\delta z_k} \cdot 1\\
+&= \frac{\delta L}{\delta z_k}
+\end{align*}
+$$
+
+Therefore, $\frac{\delta L}{\delta b_k}=\frac{\delta L}{\delta z_k}$ So to get $\frac{\delta L}{\delta b_k}$ we simply take an average
+
+$$
+\frac{\delta L}{\delta b_k}=\frac{1}{m} \cdot \sum_{k=1}^m \frac{\delta L}{\delta z_k}
+$$
+
+Which is implemented in the code as
+```python
+self.layers[-1].db = 1/m * np.sum(self.layers[-1].dZ, 1).reshape(-1, 1)
+```
 
 ## He Initialisation
 
