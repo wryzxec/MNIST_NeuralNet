@@ -11,9 +11,6 @@ INPUT_FEATURE_COUNT = 784
 class NeuralNetwork:
     def __init__(self, network_config):
         
-        self.z = None
-        self.a = None
-
         hidden_layer_architecture = network_config.layer_architecture
 
         self.layers = []
@@ -101,13 +98,22 @@ class NeuralNetwork:
                 self.forward_prop(X_mini)
                 self.backward_prop(X_mini, Y_mini)
 
+                momentum_applied = network_config.momentum_applied
+
                 for layer in self.layers:
-                    layer.update_weights_biases(network_config.alpha)
-                    if network_config.momentum_applied:
+                    if momentum_applied:
                         layer.update_velocities(network_config.beta)
-        
-            accuracy = self.accuracy(Y_mini, self.predictions(self.layers[-1].A))
-            print('Epoch: ', i, ' Accuracy: ', accuracy)
+                    layer.update_weights_biases(network_config.alpha, momentum_applied)
+
+            network_output = self.layers[-1].A
+            accuracy = self.accuracy(Y_mini, self.predictions(network_output))
+            loss = categorical_cross_entropy_loss(one_hot(Y_mini), network_output)
+
+            print(f"Epoch: {i+1}/{network_config.epochs}")
+            print('Accuracy: ', accuracy.round(4))
+            print('Loss: ', loss.round(4))
+            print('------------------------------')
+            
 
     def predictions(self, A_out):
         return np.argmax(A_out, axis=0)
@@ -126,6 +132,9 @@ def main():
     
     network_config = NetworkConfig(
         layer_architecture = [200, 100, 25, 10],
+        alpha = 0.5,
+        epochs = 20,
+        batch_size=128,
         momentum_applied=True
     )
     neural_network = NeuralNetwork(network_config)
@@ -144,6 +153,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

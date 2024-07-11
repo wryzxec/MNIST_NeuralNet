@@ -65,9 +65,13 @@ class Layer:
         a_out = activation(z)
         return z, a_out
 
-    def update_weights_biases(self, alpha):
-        self.W -= alpha * self.dW
-        self.b -= alpha * self.db
+    def update_weights_biases(self, alpha, momentum_applied):
+        if(momentum_applied):
+            self.W -= alpha * self.vW
+            self.b -= alpha * self.vb
+        else:
+            self.W -= alpha * self.dW
+            self.b -= alpha * self.db
 
         return self.W, self.b
     
