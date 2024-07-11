@@ -258,7 +258,7 @@ self.layers[-1].db = 1/m * np.sum(self.layers[-1].dZ, 1).reshape(-1, 1)
 
 ## He Initialisation
 
-Weights cannot be initialised to 0. Since $a = \overline{w}X + b =0$ would result in every neuron outputting 0 and all neurons outputting the same value, regardless of input (symmetry).
+Weights cannot be initialised to 0. Since $a = \overline{w}X + b = b$ for $X=0$. This would result in all neurons outputting the same value, regardless of input (symmetry).
 
 For this model, He initialisation is used and is defined as follows:
 
@@ -271,6 +271,7 @@ This denotes a normal distribution with mean $0$ and standard deviation $\sqrt{\
 Using He initialisation reduces the chances of gradients 'vanishing' or 'exploding' during backpropagation and also leads to faster convergence. It is particularly suited for neural networks utilising the ReLU activation function.
 ## Analysing Results
 
+### Network Performance
 <div align="center">
 
 | Epochs | Mini-Batch Size | Neurons (Layer1/Layer2/.../Layer n) | Learning Rate | Momentum Applied (True/False) | Accuracy (%) |
@@ -284,3 +285,9 @@ Using He initialisation reduces the chances of gradients 'vanishing' or 'explodi
 </div>
 
 *Note:* A mini-batch size of 60,000 just means that batch gradient descent is being used over mini-batch gradient descent.
+
+### The Effect of Momentum on Network Performance
+
+
+
+![Momentum Comparison Graphs](assets/momentum_comparison_graphs.png)
