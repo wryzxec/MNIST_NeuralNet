@@ -2,9 +2,6 @@ import numpy as np
 import struct
 from array import array
 from os.path import join
-
-import random
-import matplotlib.pyplot as plt
 from pathlib import Path
 
 class MnistDataHandler: 
@@ -80,28 +77,3 @@ class MnistDataHandler:
             mini_batches.append((X_mini, Y_mini))
 
         return mini_batches
-
-    def plot_images(self, images, title_texts):
-        images = np.reshape(images, (np.shape(images)[0], 28, 28))
-
-        cols = 5
-        rows = int(len(images)/cols) + 1 
-
-        images_plot = plt.figure(figsize=(5,5))
-        images_plot.subplots_adjust(hspace = 1)
-
-        index = 1    
-        for i in range(len(images)):        
-            image = images[i]        
-            title_text = title_texts[i]
-            image_subplot = plt.subplot(rows, cols, index)
-            image_subplot.axis('off')
-            image_subplot.imshow(image, cmap=plt.cm.gray)
-            
-            if (title_text != ''):
-                image_subplot.set_title(title_text, fontsize = 15)
-            
-            images_plot.add_subplot(image_subplot)
-            index += 1
-        
-        return images_plot
