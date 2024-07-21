@@ -60,10 +60,9 @@ class Layer:
         self.vW = np.zeros_like(self.W)
         self.vb = np.zeros_like(self.b)
     
-    def dense(self, a_in, W, b, activation):
-        z = W.dot(a_in) + b
-        a_out = activation(z)
-        return z, a_out
+    def dense(self, a_in, activation):
+        self.Z = self.W.dot(a_in) + self.b
+        self.A = activation(self.Z)
 
     def update_weights_biases(self, alpha, momentum_applied):
         if(momentum_applied):
@@ -72,12 +71,8 @@ class Layer:
         else:
             self.W -= alpha * self.dW
             self.b -= alpha * self.db
-
-        return self.W, self.b
     
     def update_velocities(self, beta):
         self.vW = beta * self.vW + (1 - beta) * self.dW
         self.vb = beta * self.vb + (1 - beta) * self.db
-
-        return self.vW, self.vb
     

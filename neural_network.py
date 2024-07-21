@@ -38,23 +38,16 @@ class NeuralNetwork:
     def forward_prop(self, X):
         
         # propagate the image input X, through the first hidden layer
-        z_i, a_i = self.layers[0].dense(X, self.layers[0].W, self.layers[0].b, relu)
-        self.layers[0].Z = z_i
-        self.layers[0].A = a_i
+        self.layers[0].dense(X, relu)
 
         # propagate through the remaining hidden layers, up to but not including the output layer
         layer_count = len(self.layers)
 
         for i in range(1, layer_count-1):
-
-            z_i, a_i = self.layers[i].dense(self.layers[i-1].A, self.layers[i].W, self.layers[i].b, relu)
-            self.layers[i].Z = z_i
-            self.layers[i].A = a_i
+            self.layers[i].dense(self.layers[i-1].A, relu)
 
         # propagate through the ouput layer 
-        z_i, a_i = self.layers[-1].dense(self.layers[-2].A, self.layers[-1].W, self.layers[-1].b, softmax)
-        self.layers[-1].Z = z_i
-        self.layers[-1].A = a_i
+        self.layers[-1].dense(self.layers[-2].A, softmax)
 
     def backward_prop(self, X, Y):
 
