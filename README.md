@@ -9,7 +9,7 @@ A Neural Network, trained on the MNIST database, with the task of classifying ha
 <div align="center">
 
 View all the details of the project 
-[**HERE**](https://wryzxec.github.io/#/numpy-neural-network)
+[**HERE**](https://wryzxec.github.io/neuralnetproject.html)
 
 </div>
 
